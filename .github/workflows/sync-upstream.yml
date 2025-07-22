@@ -1,0 +1,27 @@
+name: Sync upstream repo
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # 每15分钟同步一次（可修改频率）
+  workflow_dispatch:        # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout forked repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "aimafan123"
+          git config --global user.email "chongrufan@nuaa.edu.cn"
+
+      - name: Add upstream and fetch
+        run: |
+          git remote add upstream https://github.com/iterativv/NostalgiaForInfinity.git
+          git fetch upstream
+          git merge upstream/main --allow-unrelated-histories -m "Sync from upstream"
+          git push origin main
