@@ -21,4 +21,3 @@ jobs:
               "commit_message": "${{ github.event.head_commit.message }}",
               "commit_url": "${{ github.event.head_commit.url }}"
             }'
-
