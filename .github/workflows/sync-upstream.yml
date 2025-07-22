@@ -2,12 +2,16 @@ name: Sync upstream repo
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # 每15分钟同步一次（可修改频率）
+    - cron: '*/15 * * * *'  # 每15分钟同步一次
   workflow_dispatch:        # 允许手动触发
+
+permissions:
+  contents: write  # 允许推送到目标分支
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout forked repo
         uses: actions/checkout@v4
@@ -23,5 +27,12 @@ jobs:
         run: |
           git remote add upstream https://github.com/iterativv/NostalgiaForInfinity.git
           git fetch upstream
-          git merge upstream/main --allow-unrelated-histories -m "Sync from upstream"
-          git push origin main
+
+      - name: Merge upstream/main into current branch
+        run: |
+          git checkout main
+          git merge upstream/main --no-edit || echo "Nothing to merge"
+
+      - name: Push changes back to fork
+        run: |
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} main
